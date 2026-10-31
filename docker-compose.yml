@@ -1,0 +1,87 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: agrisense-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-agrisense}
+      POSTGRES_USER: ${POSTGRES_USER:-agrisense_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agrisense_dev_pwd}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agrisense_user} -d ${POSTGRES_DB:-agrisense}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  processing-service:
+    build: ./processing-service
+    container_name: agrisense-processing
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-agrisense_user}:${POSTGRES_PASSWORD:-agrisense_dev_pwd}@postgres:5432/${POSTGRES_DB:-agrisense}
+      THRESHOLD_TEMPERATURE_MAX: ${THRESHOLD_TEMPERATURE_MAX:-35.0}
+      THRESHOLD_SOIL_HUMIDITY_MIN: ${THRESHOLD_SOIL_HUMIDITY_MIN:-25.0}
+      THRESHOLD_AIR_HUMIDITY_MIN: ${THRESHOLD_AIR_HUMIDITY_MIN:-30.0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  collection-service:
+    build: ./collection-service
+    container_name: agrisense-collection
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-agrisense_user}:${POSTGRES_PASSWORD:-agrisense_dev_pwd}@postgres:5432/${POSTGRES_DB:-agrisense}
+      PROCESSING_SERVICE_URL: http://processing-service:8000
+      HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-5.0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8001:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      processing-service:
+        condition: service_started
+
+  simulator:
+    build: ./simulator
+    container_name: agrisense-simulator
+    restart: unless-stopped
+    environment:
+      COLLECTION_SERVICE_URL: http://collection-service:8000
+      SIMULATION_INTERVAL_SECONDS: ${SIMULATION_INTERVAL_SECONDS:-5}
+      SIMULATION_ANOMALY_PROBABILITY: ${SIMULATION_ANOMALY_PROBABILITY:-0.25}
+      HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-5.0}
+      MAX_RETRIES: ${MAX_RETRIES:-3}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      collection-service:
+        condition: service_started
+
+  dashboard:
+    build: ./dashboard
+    container_name: agrisense-dashboard
+    restart: unless-stopped
+    environment:
+      COLLECTION_SERVICE_URL: http://collection-service:8000
+      PROCESSING_SERVICE_URL: http://processing-service:8000
+      HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-5.0}
+    ports:
+      - "8501:8501"
+    depends_on:
+      collection-service:
+        condition: service_started
+      processing-service:
+        condition: service_started
+
+volumes:
+  postgres_data:
+

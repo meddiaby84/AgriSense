@@ -1,0 +1,26 @@
+# Secrets et fichiers d'environnement
+.env
+github.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Docker volumes locaux éventuels
+postgres_data/
+
