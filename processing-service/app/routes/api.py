@@ -1,5 +1,4 @@
 from typing import Optional
-import psycopg2
 from fastapi import APIRouter, HTTPException, Query, status
 from app.config import settings
 from app.db import get_db_connection
@@ -7,7 +6,7 @@ from app.schemas.models import EvaluateMeasurementRequest
 from app.services.processor import (
     evaluate_and_store_alerts,
     compute_descriptive_stats,
-    period_to_sql_interval,
+    period_to_cutoff_datetime,
 )
 
 router = APIRouter(prefix="/api/v1", tags=["Processing & Consultation"])
@@ -39,7 +38,7 @@ def list_parcels():
                     """
                 )
                 return [dict(r) for r in cur.fetchall()]
-    except psycopg2.Error as e:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Base de données inaccessible : {e}",
@@ -72,7 +71,7 @@ def list_sensors(parcel_id: Optional[str] = Query(default=None)):
                         """
                     )
                 return [dict(r) for r in cur.fetchall()]
-    except psycopg2.Error as e:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Base de données inaccessible : {e}",
@@ -86,7 +85,7 @@ def list_measurements(
     period: Optional[str] = Query(default="last_24_hours"),
     limit: int = Query(default=200, ge=1, le=2000),
 ):
-    interval = period_to_sql_interval(period)
+    cutoff = period_to_cutoff_datetime(period)
     conditions = []
     params = []
 
@@ -96,8 +95,9 @@ def list_measurements(
     if sensor_id:
         conditions.append("m.capteur_id = %s")
         params.append(sensor_id)
-    if interval:
-        conditions.append(f"m.measured_at >= NOW() - INTERVAL '{interval}'")
+    if cutoff:
+        conditions.append("m.measured_at >= %s")
+        params.append(cutoff)
 
     where_clause = f"WHERE {' AND '.join(conditions)}" if conditions else ""
     params.append(limit)
@@ -127,7 +127,7 @@ def list_measurements(
             with conn.cursor() as cur:
                 cur.execute(query, tuple(params))
                 return [dict(r) for r in cur.fetchall()]
-    except psycopg2.Error as e:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Base de données inaccessible : {e}",
@@ -168,7 +168,7 @@ def get_measurement(measurement_id: int):
                 return dict(row)
     except HTTPException:
         raise
-    except psycopg2.Error as e:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Base de données inaccessible : {e}",
@@ -193,7 +193,7 @@ def list_alerts(
     period: Optional[str] = Query(default="last_24_hours"),
     limit: int = Query(default=100, ge=1, le=1000),
 ):
-    interval = period_to_sql_interval(period)
+    cutoff = period_to_cutoff_datetime(period)
     conditions = []
     params = []
 
@@ -203,8 +203,9 @@ def list_alerts(
     if sensor_id:
         conditions.append("m.capteur_id = %s")
         params.append(sensor_id)
-    if interval:
-        conditions.append(f"a.created_at >= NOW() - INTERVAL '{interval}'")
+    if cutoff:
+        conditions.append("a.created_at >= %s")
+        params.append(cutoff)
 
     where_clause = f"WHERE {' AND '.join(conditions)}" if conditions else ""
     params.append(limit)
@@ -238,7 +239,7 @@ def list_alerts(
             with conn.cursor() as cur:
                 cur.execute(query, tuple(params))
                 return [dict(r) for r in cur.fetchall()]
-    except psycopg2.Error as e:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Base de données inaccessible : {e}",
@@ -289,4 +290,3 @@ def health_check():
         "database": "connected" if db_ok else "disconnected",
         "thresholds": settings.thresholds_dict,
     }
-

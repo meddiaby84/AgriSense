@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
 from fastapi import HTTPException, status
 from app.config import settings
@@ -95,18 +96,19 @@ def compute_descriptive_stats(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def period_to_sql_interval(period: Optional[str]) -> Optional[str]:
+def period_to_cutoff_datetime(period: Optional[str]) -> Optional[datetime]:
     mapping = {
-        "last_15_minutes": "15 minutes",
-        "last_1_hour": "1 hour",
-        "last_6_hours": "6 hours",
-        "last_24_hours": "24 hours",
-        "last_7_days": "7 days",
-        "last_30_days": "30 days",
+        "last_15_minutes": timedelta(minutes=15),
+        "last_1_hour": timedelta(hours=1),
+        "last_6_hours": timedelta(hours=6),
+        "last_24_hours": timedelta(hours=24),
+        "last_7_days": timedelta(days=7),
+        "last_30_days": timedelta(days=30),
     }
     if not period or period == "all":
         return None
-    return mapping.get(period, "24 hours")
+    delta = mapping.get(period, timedelta(hours=24))
+    return datetime.now(timezone.utc) - delta
 
 
 def evaluate_and_store_alerts(req: EvaluateMeasurementRequest) -> Dict[str, Any]:

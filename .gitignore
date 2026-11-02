@@ -21,6 +21,8 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Docker volumes locaux éventuels
+# Docker volumes et bases SQLite locales
 postgres_data/
+*.db
+*.db-journal
 

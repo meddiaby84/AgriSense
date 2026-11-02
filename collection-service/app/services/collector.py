@@ -1,7 +1,6 @@
 import logging
 from typing import Dict, Any
 import httpx
-import psycopg2
 from fastapi import HTTPException, status
 from app.config import settings
 from app.db import get_db_connection
@@ -63,8 +62,8 @@ def store_and_forward_measurement(payload: MeasurementCreate) -> Dict[str, Any]:
 
     except HTTPException:
         raise
-    except psycopg2.Error as db_err:
-        logger.error(f"Erreur d'accès à PostgreSQL lors de la collecte : {db_err}")
+    except Exception as db_err:
+        logger.error(f"Erreur d'accès à la base de données lors de la collecte : {db_err}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Base de données temporairement inaccessible.",

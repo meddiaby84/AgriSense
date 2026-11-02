@@ -1,0 +1,51 @@
+# Blueprint Cloud (Render / Déploiement automatisé depuis GitHub)
+databases:
+  - name: agrisense-postgres
+    databaseName: agrisense
+    user: agrisense_user
+    plan: free
+
+services:
+  - type: web
+    name: agrisense-processing-service
+    runtime: docker
+    dockerfilePath: ./processing-service/Dockerfile
+    dockerContext: ./processing-service
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agrisense-postgres
+          property: connectionString
+      - key: THRESHOLD_TEMPERATURE_MAX
+        value: "35.0"
+      - key: THRESHOLD_SOIL_HUMIDITY_MIN
+        value: "25.0"
+      - key: THRESHOLD_AIR_HUMIDITY_MIN
+        value: "30.0"
+
+  - type: web
+    name: agrisense-collection-service
+    runtime: docker
+    dockerfilePath: ./collection-service/Dockerfile
+    dockerContext: ./collection-service
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agrisense-postgres
+          property: connectionString
+      - key: PROCESSING_SERVICE_URL
+        value: https://agrisense-processing-service.onrender.com
+
+  - type: web
+    name: agrisense-dashboard
+    runtime: docker
+    dockerfilePath: ./dashboard/Dockerfile
+    dockerContext: ./dashboard
+    plan: free
+    envVars:
+      - key: COLLECTION_SERVICE_URL
+        value: https://agrisense-collection-service.onrender.com
+      - key: PROCESSING_SERVICE_URL
+        value: https://agrisense-processing-service.onrender.com
