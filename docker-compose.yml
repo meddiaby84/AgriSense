@@ -74,6 +74,8 @@ services:
       COLLECTION_SERVICE_URL: http://collection-service:8000
       PROCESSING_SERVICE_URL: http://processing-service:8000
       HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-5.0}
+    volumes:
+      - ./dashboard/app.py:/app/app.py
     ports:
       - "8501:8501"
     depends_on:
