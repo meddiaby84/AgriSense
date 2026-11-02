@@ -2,7 +2,7 @@
 
 **Contexte académique :** Master d'Excellence — Analytics des données et Intelligence Artificielle (ADIA)  
 **Module :** Systèmes répartis et distribués  
-**Auteur :** Mohamed DIABY (`meddiaby84`)  
+**Équipe Projet :** **DIABY Mohamed**, **ELBAZ Youssef**, **BENLAHCEN Mohamed**  
 
 AgriSense est une plateforme distribuée conteneurisée permettant de simuler des capteurs agricoles multi-parcelles, de collecter et valider leurs mesures via une API REST, de calculer des indicateurs statistiques descriptifs, de détecter des dépassements de seuils en temps réel et de visualiser l'ensemble dans un tableau de bord interactif moderne.
 

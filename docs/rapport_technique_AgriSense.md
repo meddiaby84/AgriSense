@@ -3,7 +3,7 @@
 **Titre :** Conception et développement d'une plateforme distribuée de supervision et d'analyse des données IoT agricoles  
 **Formation :** Master d'Excellence — Analytics des données et Intelligence Artificielle (ADIA)  
 **Module :** Systèmes répartis et distribués  
-**Auteur :** Mohamed DIABY (`meddiaby84`)  
+**Équipe Projet :** **DIABY Mohamed**, **ELBAZ Youssef**, **BENLAHCEN Mohamed**  
 **Dépôt GitHub :** https://github.com/meddiaby84/AgriSense  
 
 ---
@@ -64,3 +64,4 @@ L'ensemble des résultats détaillés est disponible dans [`docs/resultats_exper
 - **Tests unitaires :** `9/9 PASSED` (`4 passed` sur `collection-service`, `5 passed` sur `processing-service`).
 - **Tests d'intégration :** `3/3 PASSED` sur l'environnement Docker actif.
 - **Benchmark de charge (500 requêtes jusqu'à 50 clients simultanés) :** Débit soutenu de **`113,33 req/s`**, temps de réponse moyen de **`63,98 ms`** à faible charge (`407,83 ms` à 50 clients simultanés) et **`0,0 %` d'erreur**.
+
