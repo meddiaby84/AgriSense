@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>PRD & TRD — AgriSense (Rapport Complet)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.6;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 30px;
+      background: #f8fafc;
+    }
+    .page-box {
+      background: #ffffff;
+      padding: 45px 50px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+      border: 1px solid #e2e8f0;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #064e3b 0%, #047857 60%, #0f766e 100%);
+      color: white;
+      padding: 32px 36px;
+      border-radius: 14px;
+      margin-bottom: 30px;
+    }
+    .header-banner h1 {
+      margin: 0 0 10px 0;
+      font-size: 26px;
+      font-weight: 800;
+    }
+    .header-banner p {
+      margin: 4px 0;
+      color: #d1fae5;
+      font-size: 14px;
+    }
+    .team-box {
+      background: #ecfdf5;
+      border-left: 5px solid #059669;
+      padding: 16px 22px;
+      border-radius: 8px;
+      margin-bottom: 28px;
+    }
+    h2 {
+      color: #065f46;
+      border-bottom: 2px solid #d1fae5;
+      padding-bottom: 8px;
+      margin-top: 34px;
+      font-size: 20px;
+    }
+    h3 {
+      color: #0f172a;
+      margin-top: 22px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 13.5px;
+    }
+    th {
+      background: #064e3b;
+      color: white;
+      text-align: left;
+      padding: 10px 12px;
+      font-weight: 600;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: #0f766e;
+    }
+    .qa-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid #0284c7;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .print-btn {
+      display: inline-block;
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    @media print {
+      body { background: white; padding: 0; }
+      .page-box { box-shadow: none; border: none; padding: 0; }
+      .print-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">🖨️ Télécharger / Enregistrer en PDF (Ctrl + P)</button>
+
+  <div class="page-box">
+    <div class="header-banner">
+      <h1>🌱 PRD & TRD — AgriSense</h1>
+      <p><b>Plateforme distribuée de supervision et d'analyse des données IoT agricoles</b></p>
+      <p>Master d'Excellence — Analytics des données et Intelligence Artificielle (ADIA) | Module : Systèmes répartis et distribués</p>
+      <p>Dépôt GitHub : <b>https://github.com/meddiaby84/AgriSense</b></p>
+    </div>
+
+    <div class="team-box">
+      <b>👥 Membres du Groupe (Trinôme) :</b><br/>
+      1. <b>DIABY Mohamed</b> — Architecture Distribuée, Simulateur IoT, Service de Collecte & Orchestration Docker<br/>
+      2. <b>ELBAZ Youssef</b> — Modèle de Données PostgreSQL, Service de Traitement, Algorithme de Seuils & Statistiques<br/>
+      3. <b>BENLAHCEN Mohamed</b> — Tableau de Bord Streamlit/Plotly, Tests Unitaires/Intégration & Benchmark de Charge
+    </div>
+
+    <h2>1. Présentation & Problématique (PRD)</h2>
+    <p>
+      <b>AgriSense</b> est une plateforme distribuée conteneurisée destinée à collecter, valider, stocker, analyser et visualiser en temps réel des mesures issues de capteurs agricoles simulés (température, humidité du sol, humidité de l'air) répartis sur plusieurs parcelles.
+    </p>
+    <p>
+      <b>Problématique technique traitée :</b> <i>Comment concevoir une architecture microservices découplée capable d'ingérer des flux IoT continus provenant de multiples capteurs, d'assurer la validation technique et la détection d'alertes en temps réel, tout en garantissant l'isolation des pannes, la persistance sans perte de données et la reproductibilité du déploiement ?</i>
+    </p>
+
+    <h2>2. Cartographie Complète des Outils et Technologies Utilisés par Partie</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Partie du Projet</th>
+          <th>Dossier / Fichier</th>
+          <th>Outils, Langages & Bibliothèques</th>
+          <th>Rôle exact dans AgriSense</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>1. Simulateur IoT</b></td>
+          <td><code>simulator/app/main.py</code></td>
+          <td><b>Python 3.11</b>, <code>httpx</code> (0.27.2), <code>random</code>, <code>datetime</code>, <code>logging</code></td>
+          <td>Simule 5 capteurs actifs sur 3 parcelles. Génère des mesures JSON horodatées en UTC, simule des anomalies climatiques (25 %) et gère les pannes réseau via <i>timeout</i> (5s) et <i>retry avec backoff progressif</i> (<code>MAX_RETRIES=3</code>).</td>
+        </tr>
+        <tr>
+          <td><b>2. Service de Collecte</b></td>
+          <td><code>collection-service/</code> (Port <code>8001</code>)</td>
+          <td><b>FastAPI</b> (0.115.0), <b>Uvicorn</b>, <b>Pydantic v2</b> (2.9.2), <b>Psycopg2-binary</b>, <b>HTTPX</b></td>
+          <td>Expose <code>POST /api/v1/measurements</code> et <code>GET /api/v1/health</code>. Valide les types et plages physiques (<code>[-40, 80]°C</code>, <code>[0, 100]%</code>), vérifie que le capteur existe et est actif, insère la mesure dans PostgreSQL et appelle <code>processing-service</code> avec repli en mode dégradé (<code>accepted_degraded</code>).</td>
+        </tr>
+        <tr>
+          <td><b>3. Service de Traitement</b></td>
+          <td><code>processing-service/</code> (Port <code>8002</code>)</td>
+          <td><b>FastAPI</b> (0.115.0), <b>Uvicorn</b>, <b>Pydantic v2</b>, <b>Psycopg2</b> (<code>RealDictCursor</code>)</td>
+          <td>Expose <code>POST /api/v1/evaluate</code> et les routes <code>GET</code> (<code>/parcels</code>, <code>/sensors</code>, <code>/measurements</code>, <code>/alerts</code>, <code>/statistics</code>, <code>/health</code>). Détecte les dépassements de seuils (<code>T &gt; 35°C</code>, <code>Sol &lt; 25%</code>, <code>Air &lt; 30%</code>) et calcule <code>min</code>, <code>max</code>, <code>average</code>.</td>
+        </tr>
+        <tr>
+          <td><b>4. Base de Données</b></td>
+          <td><code>database/init.sql</code> (Port <code>5432</code>)</td>
+          <td><b>PostgreSQL 16</b> (<code>postgres:16-alpine</code>), SQL Relationnel, Index B-Tree + Repli <b>SQLite 3</b></td>
+          <td>Persiste les 4 tables (<code>parcelles</code>, <code>capteurs</code>, <code>mesures</code>, <code>alertes</code>) avec clés étrangères <code>ON DELETE CASCADE</code> et pré-remplit 3 parcelles et 6 capteurs (dont <code>sensor-006</code> en maintenance).</td>
+        </tr>
+        <tr>
+          <td><b>5. Frontend / Dashboard</b></td>
+          <td><code>dashboard/app.py</code> (Port <code>8501</code>)</td>
+          <td><b>Streamlit</b> (1.39.0), <b>Plotly Express & Graph Objects</b> (5.24.1), <b>Pandas</b> (2.2.3), <b>HTTPX</b>, <b>CSS3</b></td>
+          <td>Interface Agritech SaaS à 4 vues (Vue générale, Supervision parcelles avec jauges circulaires, Laboratoire d'analyse temporelle & corrélation, Centre d'alertes + Console d'injection IoT). Interroge <b>uniquement</b> les API REST.</td>
+        </tr>
+        <tr>
+          <td><b>6. Conteneurisation</b></td>
+          <td><code>docker-compose.yml</code></td>
+          <td><b>Docker Engine</b>, <b>Docker Compose</b>, <code>python:3.11-slim</code>, <code>pg_isready</code></td>
+          <td>Orchestre les 5 conteneurs isolés sur un réseau bridge interne, gère les variables d'environnement (<code>.env</code>), le volume persistant <code>postgres_data</code> et les <i>healthchecks</i>.</td>
+        </tr>
+        <tr>
+          <td><b>7. Tests & Benchmark</b></td>
+          <td><code>tests/</code></td>
+          <td><b>Pytest</b> (8.3.3), <b>Asyncio</b>, <b>HTTPX AsyncClient</b>, <code>statistics</code></td>
+          <td>Exécute 9 tests unitaires, 3 tests d'intégration bout-en-bout et le benchmark de charge asynchrone (500 requêtes jusqu'à 50 clients simultanés).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Distinction Validation Technique vs Alerte Métier</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Cas de figure</th>
+          <th>Exemple de valeur</th>
+          <th>Service responsable</th>
+          <th>Comportement & Code HTTP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Valeur techniquement invalide</b></td>
+          <td><code>temperature = 145 °C</code> ou <code>soil_humidity = -12 %</code></td>
+          <td><code>collection-service</code> (Pydantic)</td>
+          <td>Rejet immédiat avant stockage — <b>HTTP 422 Unprocessable Entity</b></td>
+        </tr>
+        <tr>
+          <td><b>Capteur inconnu</b></td>
+          <td><code>sensor_id = "sensor-999"</code></td>
+          <td><code>collection-service</code></td>
+          <td>Rejet avant stockage — <b>HTTP 404 Not Found</b></td>
+        </tr>
+        <tr>
+          <td><b>Capteur en maintenance</b></td>
+          <td><code>sensor_id = "sensor-006"</code> (<code>actif = FALSE</code>)</td>
+          <td><code>collection-service</code></td>
+          <td>Rejet avant stockage — <b>HTTP 400 Bad Request</b></td>
+        </tr>
+        <tr>
+          <td><b>Mesure critique mais valide</b></td>
+          <td><code>temperature = 38.4 °C</code> (&gt; 35°C) et <code>soil_humidity = 19.5 %</code> (&lt; 25%)</td>
+          <td><code>collection-service</code> puis <code>processing-service</code></td>
+          <td>Stockage dans <code>mesures</code> + Création de 2 alertes dans <code>alertes</code> — <b>HTTP 201 Created</b></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Résultats Expérimentaux Réels (Tests, Panne & Charge)</h2>
+    <h3>4.1. Tests Automatisés Pytest (12 / 12 PASSED)</h3>
+    <ul>
+      <li><b>Tests unitaires <code>collection-service</code> :</b> <code>4 passed in 0.12s</code> (payload valide, température hors plage, humidité négative, capteur vide).</li>
+      <li><b>Tests unitaires <code>processing-service</code> :</b> <code>5 passed in 0.49s</code> (valeurs normales, dépassement thermique, dépassements multiples, calcul <code>min/max/average</code>, liste vide).</li>
+      <li><b>Tests d'intégration bout-en-bout :</b> <code>3 passed in 0.32s</code> (healthchecks, flux complet création mesure + alerte + statistiques, rejet 404 capteur inconnu).</li>
+    </ul>
+
+    <h3>4.2. Test de Résilience (Arrêt de <code>processing-service</code>)</h3>
+    <p>
+      Lors de l'arrêt de <code>processing-service</code> (<code>docker compose stop processing-service</code>), le service de collecte continue d'enregistrer les mesures dans PostgreSQL sans perte de données et renvoie :
+      <code>HTTP 201 {'status': 'accepted_degraded', 'message': 'Measurement stored, but processing-service is currently unreachable', 'measurement_id': 1241}</code>.
+    </p>
+
+    <h3>4.3. Benchmark de Charge (500 requêtes — <code>tests/load_test.py</code>)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Clients simultanés</th>
+          <th>Requêtes envoyées</th>
+          <th>Durée totale (s)</th>
+          <th>Temps moyen (ms)</th>
+          <th>Latence P95 (ms)</th>
+          <th>Débit (req/s)</th>
+          <th>Taux d'erreurs (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>5</b></td>
+          <td>50</td>
+          <td>0,69 s</td>
+          <td>63,98 ms</td>
+          <td>92,26 ms</td>
+          <td><b>72,19 req/s</b></td>
+          <td><b>0,0 %</b></td>
+        </tr>
+        <tr>
+          <td><b>10</b></td>
+          <td>100</td>
+          <td>0,90 s</td>
+          <td>87,34 ms</td>
+          <td>137,72 ms</td>
+          <td><b>111,16 req/s</b></td>
+          <td><b>0,0 %</b></td>
+        </tr>
+        <tr>
+          <td><b>25</b></td>
+          <td>150</td>
+          <td>1,36 s</td>
+          <td>214,77 ms</td>
+          <td>282,43 ms</td>
+          <td><b>110,63 req/s</b></td>
+          <td><b>0,0 %</b></td>
+        </tr>
+        <tr>
+          <td><b>50</b></td>
+          <td>200</td>
+          <td>1,76 s</td>
+          <td>407,83 ms</td>
+          <td>505,01 ms</td>
+          <td><b>113,33 req/s</b></td>
+          <td><b>0,0 %</b></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>5. Répartition Détaillée pour la Soutenance (3 Membres)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Étudiant</th>
+          <th>Parties présentées à l'oral</th>
+          <th>Points techniques clés à expliquer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>1. DIABY Mohamed</b></td>
+          <td>Introduction, Architecture distribuée Docker, Simulateur IoT & Service de Collecte</td>
+          <td>Découplage des 5 conteneurs, politique de <i>retry/backoff</i> dans le simulateur, validation Pydantic dans <code>collection-service</code> et mode dégradé (<code>accepted_degraded</code>).</td>
+        </tr>
+        <tr>
+          <td><b>2. ELBAZ Youssef</b></td>
+          <td>Modèle PostgreSQL, Service de Traitement, Détection de Seuils & Statistiques</td>
+          <td>Schéma relationnel à 4 tables (<code>init.sql</code>), différence entre erreur 422 et alerte métier, algorithme <code>detect_alerts</code> et calcul de <code>min/max/average</code>.</td>
+        </tr>
+        <tr>
+          <td><b>3. BENLAHCEN Mohamed</b></td>
+          <td>Démonstration Live du Dashboard, Tests Pytest & Analyse de Performance</td>
+          <td>Démonstration des 4 pages Streamlit/Plotly + Console d'injection IoT en direct, résultats des 12 tests <code>pytest</code> et analyse du débit de <code>113,33 req/s</code> sans erreur.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>6. Questions / Réponses Fréquentes du Jury</h2>
+    <div class="qa-card">
+      <b>Q1 : Pourquoi est-ce un vrai système distribué et non un monolithe ?</b><br/>
+      Chaque service possède son propre conteneur, ses propres dépendances et son propre serveur HTTP. Surtout, le <code>dashboard</code> n'a aucun accès direct à PostgreSQL : tout passe par des contrats d'API REST sur le réseau.
+    </div>
+    <div class="qa-card">
+      <b>Q2 : Pourquoi avoir choisi HTTP/REST plutôt que Kafka pour ce prototype ?</b><br/>
+      Pour 5 à 50 capteurs simultanés, HTTP/REST avec FastAPI offre une latence très faible (~64 ms), un débit de plus de 6 700 mesures/minute (113 req/s), une documentation OpenAPI automatique et une gestion fine des codes d'erreur HTTP (201, 400, 404, 422, 503).
+    </div>
+  </div>
+</body>
+</html>
+
